@@ -1,0 +1,20 @@
+
+heart_beat_kill_pid = 92167
+heart_beat_timeout = 11
+init terminating in do_boot ()
+heart: Wed Jan 22 13:13:51 2014: Erlang is crashing .. (waiting for crash dump file)
+heart: Wed Jan 22 13:13:52 2014: Executed "/usr/local/Cellar/couchdb/HEAD/bin/couchdb -k" -> 0. Terminating.
+
+heart_beat_kill_pid = 92608
+heart_beat_timeout = 11
+init terminating in do_boot ()
+heart: Wed Jan 22 13:23:26 2014: Erlang is crashing .. (waiting for crash dump file)
+heart: Wed Jan 22 13:23:27 2014: Executed "/usr/local/Cellar/couchdb/HEAD/bin/couchdb -k" -> 0. Terminating.
+
+heart_beat_kill_pid = 3441
+heart_beat_timeout = 11
+
+heart_beat_kill_pid = 1474
+heart_beat_timeout = 11
+heart: Fri Jan 24 13:13:38 2014: heart-beat time-out, no activity for 503 seconds
+heart: Fri Jan 24 13:13:39 2014: Executed "/usr/local/Cellar/couchdb/HEAD/bin/couchdb -k" -> 0. Terminating.

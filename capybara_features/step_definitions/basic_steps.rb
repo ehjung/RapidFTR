@@ -102,6 +102,8 @@ end
 When /^I am editing the child with name "([^\"]*)"$/ do |name|
   child = find_child_by_name name
   visit children_path+"/#{child.id}/edit"
+  puts "The children_path is:"
+  ptus children_path+"/#{child.id}/edit"
 end
 
 When /^I wait for (\d+) seconds$/ do |seconds|

@@ -13,10 +13,18 @@
 </p>
 <% end %>
 
+<% if !params[:is_nil] %>
 <% @child.photos.each do |photo| %>
     <p class="thumbnail">
       <%= label_tag "delete_child_photo[#{photo.name}]", t("child.actions.delete_photo") %>
       <%= check_box_tag("delete_child_photo[#{photo.name}]") %>
-      <%= thumbnail_tag(@child, photo.name) %>
+      <% if @page_name == t("enquiries.register_new_enquiry") %>
+        <%= enquiry_thumbnail_tag(@child, photo.name) %>
+      <% elsif @page_name == t("home.view_records") %>
+         <%= child_thumbnail_tag(@child, photo.name) %>
+      <% end %>
     </p>
 <% end %>
+<% end %>
+  
+

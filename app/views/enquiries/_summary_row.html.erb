@@ -1,0 +1,37 @@
+<!-- BEGIN: item -->
+<div id="enquiry_<%= enquiry.id %>" class="enquiry_summary_panel">
+  <div class="photo_panel">
+    <%= link_to enquiry_thumbnail_tag(enquiry, enquiry.primary_photo_id), enquiry_path(enquiry.id) %>
+  </div>
+  <div class="summary_panel">
+   
+    <div class="clearfix"></div>
+    <div class="summary_item">
+      <div class="key"><%= t("enquiry.enquirer_name") %>:</div>
+      <div class="value"><%= enquiry.enquirer_name %></div>
+    </div>
+
+    <div class="summary_item">
+      <div class="key"><%= t("enquiry.id_number") %>:</div>
+      <div class="value"><%= enquiry.id %></div>
+    </div>
+
+    <% if enquiry.potential_matches %>
+      <div class="summary_item">
+        <div class="key"><%= t("enquiry.matches_found") %>:</div>
+        <div class="value"><%= enquiry.potential_matches %></div>
+      </div>
+    <% end %>
+
+    <% if enquiry.last_updated_at %>
+      <div class="summary_item">
+        <div class="key"><%= t("enquiry.last_updated") %>:</div>
+        <div class="value"><%= current_user.localize_date(enquiry.last_updated_at) %></div>
+      </div>
+    <% end %>
+  </div>
+
+
+  <div class="clearfix"></div>
+</div>
+<!-- END: item -->

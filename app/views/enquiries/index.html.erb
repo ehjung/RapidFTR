@@ -1,0 +1,9 @@
+<%= render :partial => "header" %>
+<div class="clearfix"></div>
+
+<div class="enquiry_list">
+  <%= render :partial => "summary_row", :collection => @enquiries, :as => :enquiry, :locals => { :checkbox => false, :highlighted_fields => FormSection.sorted_highlighted_fields  }  %>
+
+</div>
+
+<br/>

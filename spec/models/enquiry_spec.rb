@@ -13,7 +13,7 @@ describe Enquiry do
       enquiry.errors[:criteria].should == ["Please add criteria to your enquiry"]
     end
 
-    it "should not create enquiry with empty criteria" do
+    it "should not create enquiry with empty criteria", focus: true do
       enquiry = create_enquiry_with_created_by('user name', {:enquirer_name => 'Vivek', :criteria => {}})
       enquiry.should_not be_valid
       enquiry.errors[:criteria].should == ["Please add criteria to your enquiry"]

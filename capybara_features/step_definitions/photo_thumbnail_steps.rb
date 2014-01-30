@@ -7,6 +7,8 @@ end
 
 Then /^I should see the thumbnail of "([^\"]*)"$/ do |child_name|
   check_link(response, child_name) {|child| child_thumbnail_path(child, child.primary_photo_id)}
+  puts "child_thumnail_path is:"
+  puts child_thumbnail_path(child, child.primary_photo_id)
 end
 
 Then /^I should see the thumbnail of "([^\"]*)" with timestamp "([^"]*)"$/ do |name, timestamp|

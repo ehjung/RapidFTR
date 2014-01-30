@@ -28,6 +28,9 @@
       <ul>
         <% if can? :read, Child %>
           <li><%= link_to t("navigation.children"), children_path %></li>
+        <% end %>
+        <% if can? :read, Enquiry %>
+          <li><%= link_to t("navigation.enquiries"), enquiries_path %></li>
         <% end  %>
         <% if current_user_name==nil or can? :manage, FormSection %>
             <li><%= link_to t("navigation.forms"), form_sections_path %></li>
@@ -64,7 +67,7 @@
     <% end %>
     <% if flash[:error].present? %>
         <div class='flash'>
-          <p class='error'><%= flash[:error] %></p>
+          <p class='errorExplanation'><%= flash[:error] %></p>
         </div>
     <% end %>
     <%= yield %>

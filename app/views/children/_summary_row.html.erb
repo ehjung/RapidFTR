@@ -2,7 +2,7 @@
 <div id="child_<%= child.id %>" class="child_summary_panel">
 
   <div class="photo_panel">
-    <%= link_to thumbnail_tag(child, child.primary_photo_id), child_path(child.id) %>
+    <%= link_to child_thumbnail_tag(child, child.primary_photo_id), child_path(child.id) %>
   </div>
   <div class="summary_panel">
     <% if checkbox %>

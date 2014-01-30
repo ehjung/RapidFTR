@@ -405,6 +405,7 @@ class Child < CouchRestRails::Document
   private
 
   def deprecated_fields
+    
     system_fields = ["created_at",
                      "last_updated_at",
                      "last_updated_by",

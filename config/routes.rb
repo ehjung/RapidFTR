@@ -33,6 +33,23 @@ RapidFTR::Application.routes.draw do
   match 'admin' => 'admin#index', :as => :admin
   match 'admin/update' => 'admin#update', :as => :admin_update
 
+#######################
+# ENQUIRY URLS
+#######################
+
+resources :enquiries
+
+match '/enquiries/:id/photo/edit' => 'enquiries#edit_photo', :as => :edit_photo, :via => :get
+match '/enquiries/:id/photo' => 'enquiries#update_photo', :as => :update_photo, :via => :put
+match '/enquiries/:enquiry_id/photos_index' => 'enquiry_media#index', :as => :photos_index
+match '/enquiries/:enquiry_id/photos' => 'enquiry_media#manage_photos', :as => :manage_photos
+match '/enquiries/:enquiry_id/audio(/:id)' => 'enquiry_media#download_audio', :as => :enquiry_audio
+match '/enquiries/:enquiry_id/photo/:photo_id' => 'enquiry_media#show_photo', :as => :enquiry_photo
+match '/enquiries/:enquiry_id/photo' => 'enquiry_media#show_photo', :as => :enquiry_legacy_photo
+match 'enquiries/:enquiry_id/select_primary_photo/:photo_id' => 'enquiries#select_primary_photo', :as => :enquiry_select_primary_photo, :via => :put
+match '/enquiries/:enquiry_id/resized_photo/:size' => 'enquiry_media#show_resized_photo', :as => :enquiry_legacy_resized_photo
+match '/enquiries/:enquiry_id/photo/:photo_id/resized/:size' => 'enquiry_media#show_resized_photo', :as => :enquiry_resized_photo
+match '/enquiries/:enquiry_id/thumbnail(/:photo_id)' => 'enquiry_media#show_thumbnail', :as => :enquiry_thumbnail
 
 #######################
 # CHILD URLS
@@ -63,7 +80,6 @@ RapidFTR::Application.routes.draw do
   match '/children/:child_id/photo/:photo_id/resized/:size' => 'child_media#show_resized_photo', :as => :child_resized_photo
   match '/children/:child_id/thumbnail(/:photo_id)' => 'child_media#show_thumbnail', :as => :child_thumbnail
   match '/children' => 'children#index', :as => :child_filter
-
 
 #######################
 # API URLS

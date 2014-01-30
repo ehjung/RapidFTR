@@ -74,6 +74,7 @@ en:
      advanced_search: "Advanced Search"
      go: "Go"
      search: "Search"
+     enquiries: "ENQUIRIES"
 
   buttons:
      delete: "Delete"
@@ -85,6 +86,20 @@ en:
      change_password: "Change Password"
      enable_photo_wall: "Enable photo wall"
      disable_photo_wall: "Disable photo wall"
+
+
+  enquiries:
+    label: "Enquiries"
+    register_new_enquiry: "Register New Enquiry"
+    enquirer_name: "Enquirer Name"
+    
+  enquiry:
+    id_number: "ID Number"
+    matches_found: "Matches Found"
+    last_updated: "Last Updated"
+
+    messages:
+      creation_success: "Enquiry record successfully created."
 
   children:
     label: "Children"

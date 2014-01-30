@@ -5,7 +5,7 @@ class MatchCriteria
   def self.dismax_query(criteria_hash)
     criteria = []
     criteria_hash.values.each do |value|
-      phrases = value.split(/\s+OR\s+/i)
+      phrases = value.to_s.split(/\s+OR\s+/i)
       phrases.map do |phrase|
         query = sanitize_phrase(phrase)
         query = query.map { |word| "(#{word.downcase}~ OR #{word.downcase}*)" }.join(" OR ")
