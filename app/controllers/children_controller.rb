@@ -16,6 +16,7 @@ class ChildrenController < ApplicationController
   def index
     authorize! :index, Child
 
+    @record = "children"
     @page_name = t("home.view_records")
     @aside = 'shared/sidebar_links'
     @filter = params[:filter] || params[:status] || "all"
@@ -43,6 +44,7 @@ class ChildrenController < ApplicationController
   # GET /children/1.xml
   def show
     authorize! :read, @child if @child["created_by"] != current_user_name
+    @record = "children"
     @form_sections = get_form_sections
     @page_name = t "child.view", :short_id => @child.short_id
     @body_class = 'profile-page'
@@ -62,6 +64,7 @@ class ChildrenController < ApplicationController
   def new
     authorize! :create, Child
 
+    @record = "children"
     @page_name = t("children.register_new_child")
     @child = Child.new
     @form_sections = get_form_sections
@@ -75,6 +78,7 @@ class ChildrenController < ApplicationController
   def edit
     authorize! :update, @child
 
+    @record = "children"
     @page_name = t("child.edit")
     @form_sections = get_form_sections
   end

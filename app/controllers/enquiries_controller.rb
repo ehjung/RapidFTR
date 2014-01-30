@@ -11,6 +11,7 @@ class EnquiriesController < ApplicationController
   def new
     authorize! :create, Enquiry
 
+    @record = "enquiry"
     @page_name = t("enquiries.register_new_enquiry")
     @child = Child.new
    
@@ -28,21 +29,31 @@ class EnquiriesController < ApplicationController
       render_error("errors.models.enquiry.create_forbidden", 403) and return
     end
 
-    @enquiry = Enquiry.new_with_user_name(current_user, params[:child])
+    if params[:child].nil?
+      @enquiry = Enquiry.new_with_user_name(current_user, params[:enquiry][:criteria])
+    else
+      @enquiry = Enquiry.new_with_user_name(current_user, params[:child])
+    end
+
+
     @enquiry[:criteria] = params[:enquiry][:criteria]
     @enquiry[:enquirer_name] = params[:enquiry][:enquirer_name]
-    
+
     params[:child][:photo] = params[:current_photo_key] unless params[:current_photo_key].nil?
     params[:child] = JSON.parse(params[:child]) if params[:child].is_a?(String)
     @child = params[:child]
     
+    unless @enquiry.valid? then
+      render :json => {:error => @enquiry.errors.full_messages}, :status => 422 and return
+    end
+
     respond_to do |format|
       if @enquiry.save && @enquiry.valid?
         flash[:notice] = t('enquiry.messages.creation_success')
-        format.html { redirect_to(enquiries_path) }
+        format.html { redirect_to(enquiries_path, :status => 201) }
         format.xml { render :xml => @enquiry, :status => :created, :location => @enquiry }
         format.json {
-          render :json => @enquiry.compact.to_json
+          render :json => @enquiry.compact.to_json, :status => 201
         }
       else
         format.html {
@@ -75,15 +86,19 @@ class EnquiriesController < ApplicationController
 
   def index
     authorize! :index, Enquiry
+
+    @record = "enquiry"
     if params[:updated_after].nil?
       @enquiries = Enquiry.all
     else
       @enquiries = Enquiry.search_by_match_updated_since(params[:updated_after])
     end
+
   end
 
   def show
     authorize! :show, Enquiry
+    @record = "enquiry"
     enquiry = Enquiry.get (params[:id])
     if !enquiry.nil?
       render :json => enquiry
@@ -115,7 +130,7 @@ class EnquiriesController < ApplicationController
       enquiry = params['enquiry']
       if params['child'].is_a?(String)
          enquiry['criteria']=JSON.parse(params['child'])
-      else 
+      elsif !params['child'].nil?
         enquiry['criteria']=params['child']
       end
     end

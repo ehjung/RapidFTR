@@ -51,6 +51,12 @@ match '/enquiries/:enquiry_id/resized_photo/:size' => 'enquiry_media#show_resize
 match '/enquiries/:enquiry_id/photo/:photo_id/resized/:size' => 'enquiry_media#show_resized_photo', :as => :enquiry_resized_photo
 match '/enquiries/:enquiry_id/thumbnail(/:photo_id)' => 'enquiry_media#show_thumbnail', :as => :enquiry_thumbnail
 
+resources :enquiries, :defaults => {:format => :json} do
+  collection do
+    delete "/destroy_all" => 'enquiries#destroy_all'
+  end
+end
+
 #######################
 # CHILD URLS
 #######################

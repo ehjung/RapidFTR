@@ -102,8 +102,6 @@ end
 When /^I am editing the child with name "([^\"]*)"$/ do |name|
   child = find_child_by_name name
   visit children_path+"/#{child.id}/edit"
-  puts "The children_path is:"
-  ptus children_path+"/#{child.id}/edit"
 end
 
 When /^I wait for (\d+) seconds$/ do |seconds|
@@ -180,7 +178,7 @@ Then /^the child listing page filtered by flagged should show the following chil
   end
 end
 
-When /^the record history should log "([^\"]*)"$/ do |field|
+And /^the record history should log "([^\"]*)"$/ do |field|
   visit(children_path+"/#{Child.all[0].id}/history")
   page.should have_content(field)
 end

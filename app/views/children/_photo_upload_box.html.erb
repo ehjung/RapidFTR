@@ -18,9 +18,9 @@
     <p class="thumbnail">
       <%= label_tag "delete_child_photo[#{photo.name}]", t("child.actions.delete_photo") %>
       <%= check_box_tag("delete_child_photo[#{photo.name}]") %>
-      <% if @page_name == t("enquiries.register_new_enquiry") %>
+      <% if @page_name == t("enquiries.register_new_enquiry") || @page_name == t("enquiries.register_new_enquiry") %>
         <%= enquiry_thumbnail_tag(@child, photo.name) %>
-      <% elsif @page_name == t("home.view_records") %>
+      <% elsif @page_name == t("home.view_records") || @page_name == t("child.edit") %>
          <%= child_thumbnail_tag(@child, photo.name) %>
       <% end %>
     </p>

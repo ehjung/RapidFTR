@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   before_filter :extend_session_lifetime
   before_filter :check_authentication
   before_filter :set_locale
+  before_filter :restrict_to_test, :only => :destroy_all
 
   rescue_from( AuthenticationFailure ) { |e| handle_authentication_failure(e) }
   rescue_from( AuthorizationFailure ) { |e| handle_authorization_failure(e) }
@@ -68,6 +69,14 @@ class ApplicationController < ActionController::Base
 
   def clean_params(param)
     param.reject{|value| value.blank?}
+  end
+
+  def restrict_to_test
+
+    if !Rails.env.android?
+      #raise ErrorResponse.unauthorized("Unauthorized Operation") 
+      render :json => "Unauthorized Operation", :status => 401
+    end 
   end
 
   def encrypt_exported_files(results, zip_filename)
