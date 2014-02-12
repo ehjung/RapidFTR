@@ -1,11 +1,31 @@
 require "spec_helper"
 
+def inject_export_generator( fake_export_generator, enquiry_data )
+  ExportGenerator.stub!(:new).with(enquiry_data).and_return( fake_export_generator )
+end
+
+def stub_out_export_generator enquiry_data = []
+  inject_export_generator( stub_export_generator = stub(ExportGenerator) , enquiry_data)
+  stub_export_generator.stub!(:enquiry_photos).and_return('')
+  stub_export_generator
+end
+
+def stub_out_enquiry_get(mock_enquiry = mock(Enquiry))
+  Enquiry.stub(:get).and_return( mock_enquiry )
+  mock_enquiry
+end
+
 describe EnquiriesController do
 
   before :each do
     Enquiry.all.each{|enquiry| enquiry.destroy}
-    fake_admin_login
+    enquiry_fake_admin_login
   end
+
+  def mock_enquiry(stubs={})
+    @mock_enquiry ||= mock_model(Enquiry, stubs).as_null_object
+  end
+
 
   describe "#authorizations" do
     it "should fail to POST create when unauthorized" do
@@ -258,15 +278,36 @@ describe EnquiriesController do
   end
 
   describe "GET index" do
+    before do
+      @session = enquiry_fake_admin_login
+      @stubs ||= {}
+      @options ||= {}
+      @params ||= {}
+    end
 
     it "should fetch all the enquiries" do
+      @stubs = { :reunited? => false }
+      @options = {:startkey=>["all"], :endkey=>["all", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_name}
+
       controller.stub(:authorize!)
 
-      enquiry = Enquiry.new({:_id => "123"})
-      Enquiry.should_receive(:all).and_return([enquiry])
+      User.stub!(:find_by_user_name).with("uname").and_return(user = mock('user', :user_name => 'uname', :organisation => 'org'))
+      enquiry = Enquiry.new_with_user_name(user, {enquirer_name: "Mulan", criteria: {name: "Fatty"}})
+      puts Enquiry.all.count
+      Enquiry.should_receive("all").and_return([enquiry])
+=begin
+      page = @options.delete(:page)
+      per_page = @options.delete(:per_page)
+      enquiries = [mock_enquiry(@stubs)]
+      @status ||= "all"
 
-      get :index 
+      enquiries.stub!(:paginate).and_return(enquiries)
+
+      Enquiry.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
+
+      get :index, :status => @status
       response.response_code.should == 200
+=end
     end
 
     it "should return enquiries with new matches when passed query parameter with last update timestamp" do
@@ -286,6 +327,18 @@ describe EnquiriesController do
       get :index, :updated_after => 'adsflkj' 
 
       response.response_code.should == 422
+    end
+
+    it "should assign all enquiries as @enquiries" do
+      page = @options.delete(:page)
+      per_page = @options.delete(:per_page)
+      enquiries = [mock_enquiry(@stubs)]
+      @status ||= "all"
+      enquiries.stub!(:paginate).and_return(enquiries)
+      Enquiry.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
+      
+      get :index, :status => @status
+      assigns[:enquiries].should == enquiries
     end
 
   end

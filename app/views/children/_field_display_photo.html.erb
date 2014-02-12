@@ -20,7 +20,7 @@ JDSLFJLKDSKLJFDJSLKF: <%= @page_name %>
 <div class="thumbnails photos">
   <% @child.photos.each do |photo| %>
       <div class="thumbnail">
-        <% if @record == "enquiry" %>
+        <% if @record == "enquiries" %>
           <%= link_to enquiry_thumbnail_tag(@child, photo.name), child_resized_photo_path(@child, photo.name || @child.current_photo_key, 328, :ts => @child.last_updated_at) %>
          <% elsif @record == "children" %>
           <%= link_to child_thumbnail_tag(@child, photo.name), child_resized_photo_path(@child, photo.name || @child.current_photo_key, 328, :ts => @child.last_updated_at) %>

@@ -1,6 +1,15 @@
 class EnquiriesController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+  skip_before_filter :check_authentication, :only => [:reindex]
 
-  before_filter :sanitise_params
+  before_filter :load_enquiry_or_redirect, :only => [ :show, :edit, :destroy, :edit_photo, :update_photo ]
+  before_filter :current_user, :except => [:reindex]
+  before_filter :sanitize_params, :only => [:update, :sync_unverified]
+
+  def reindex
+    Child.reindex!
+    render :nothing => true
+  end
 
   def destroy_all
     authorize! :create, Enquiry
@@ -11,7 +20,7 @@ class EnquiriesController < ApplicationController
   def new
     authorize! :create, Enquiry
 
-    @record = "enquiry"
+    @record = "enquiries"
     @page_name = t("enquiries.register_new_enquiry")
     @child = Child.new
    
@@ -87,7 +96,18 @@ class EnquiriesController < ApplicationController
   def index
     authorize! :index, Enquiry
 
-    @record = "enquiry"
+    @record = "enquiries"
+    @page_name = t("home.view_records")
+    @aside = 'shared/sidebar_links'
+    @filter = params[:filter] || params[:status] || "all"
+    @order = params[:order_by] || 'enquirer_name'
+    per_page = params[:per_page] || EnquiriesHelper::View::PER_PAGE
+    per_page = per_page.to_i unless per_page == 'all'
+
+    #filter_enquiries per_page
+
+
+    @record = "enquiries"
     if params[:updated_after].nil?
       @enquiries = Enquiry.all
     else
@@ -98,12 +118,68 @@ class EnquiriesController < ApplicationController
 
   def show
     authorize! :show, Enquiry
-    @record = "enquiry"
+    @record = "enquiries"
     enquiry = Enquiry.get (params[:id])
     if !enquiry.nil?
       render :json => enquiry
     else
       render :json => "", :status => 404
+    end
+  end
+
+  def filter_enquiries(per_page)
+    total_rows, enquiries = enquiries_by_user_access(@filter, per_page)
+    @enquiries = paginated_collection enquiries, total_rows
+  end
+
+  def paginated_collection instances, total_rows
+    page = params[:page] || 1
+    WillPaginate::Collection.create(page, EnquiriesHelper::View::PER_PAGE, total_rows) do |pager|
+      pager.replace(instances)
+    end
+  end
+
+  def enquiries_by_user_access(filter_option, per_page)
+    keys = [filter_option]
+    options = {:view_name => "by_all_view_#{params[:order_by] || 'enquirer_name'}".to_sym}
+    unless  can?(:view_all, Enquiry)
+      keys = [filter_option, current_user_name]
+      options = {:view_name => "by_all_view_with_created_by_#{params[:order_by] || 'created_at'}".to_sym}
+    end
+    if ['created_at', 'reunited_at', 'flag_at'].include? params[:order_by]
+      options.merge!({:descending => true, :startkey => [keys, {}].flatten, :endkey => keys})
+    else
+      options.merge!({:startkey => keys, :endkey => [keys, {}].flatten})
+    end
+    Enquiry.fetch_paginated(options, (params[:page] || 1).to_i, per_page)
+  end
+
+  def paginated_collection instances, total_rows
+    page = params[:page] || 1
+    WillPaginate::Collection.create(page, EnquiriesHelper::View::PER_PAGE, total_rows) do |pager|
+      pager.replace(instances)
+    end
+  end
+
+  def search_by_user_access(page_number = 1)
+    if can? :view_all, Enquiry
+      @results, @full_results = Enquiry.search(@search, page_number)
+    else
+      @results, @full_results = Enquiry.search_by_created_user(@search, current_user_name, page_number)
+    end
+  end
+
+  def load_enquiry_or_redirect
+    @enquiry = Enquiry.get(params[:id])
+
+    if @enquiry.nil?
+      respond_to do |format|
+        format.json { render :json => @enquiry.to_json }
+        format.html do
+          flash[:error] = "Enquiry with the given id is not found"
+          redirect_to :action => :index and return
+        end
+      end
     end
   end
 

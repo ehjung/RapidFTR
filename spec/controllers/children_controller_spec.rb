@@ -18,7 +18,7 @@ end
 describe ChildrenController do
 
   before :each do
-    fake_admin_login
+    child_fake_admin_login
   end
 
   def mock_child(stubs={})
@@ -119,7 +119,9 @@ describe ChildrenController do
           per_page = @options.delete(:per_page)
           children = [mock_child(@stubs)]
           @status ||= "all"
+
           children.stub!(:paginate).and_return(children)
+  
           Child.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, children])
 
           get :index, :status => @status
@@ -728,7 +730,7 @@ describe ChildrenController do
       User.stub!(:find_by_user_name).with("uname").and_return(user = mock('user', :user_name => 'uname', :organisation => 'org'))
       child = Child.new_with_user_name(user, {:name => 'old name'})
       child.save
-      fake_admin_login
+      child_fake_admin_login
       controller.stub(:authorize!)
       post :create, :child => {:unique_identifier => child.unique_identifier, :name => 'new name'}
       updated_child = Child.by_short_id(:key => child.short_id)

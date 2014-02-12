@@ -39,6 +39,7 @@ RapidFTR::Application.routes.draw do
 
 resources :enquiries
 
+match '/enquiries-ids' => 'enquiry_ids#all', :as => :enquiry_ids
 match '/enquiries/:id/photo/edit' => 'enquiries#edit_photo', :as => :edit_photo, :via => :get
 match '/enquiries/:id/photo' => 'enquiries#update_photo', :as => :update_photo, :via => :put
 match '/enquiries/:enquiry_id/photos_index' => 'enquiry_media#index', :as => :photos_index
@@ -50,6 +51,7 @@ match 'enquiries/:enquiry_id/select_primary_photo/:photo_id' => 'enquiries#selec
 match '/enquiries/:enquiry_id/resized_photo/:size' => 'enquiry_media#show_resized_photo', :as => :enquiry_legacy_resized_photo
 match '/enquiries/:enquiry_id/photo/:photo_id/resized/:size' => 'enquiry_media#show_resized_photo', :as => :enquiry_resized_photo
 match '/enquiries/:enquiry_id/thumbnail(/:photo_id)' => 'enquiry_media#show_thumbnail', :as => :enquiry_thumbnail
+match '/enquiries' => 'enquiries#index', :as => :enquiry_filter
 
 resources :enquiries, :defaults => {:format => :json} do
   collection do

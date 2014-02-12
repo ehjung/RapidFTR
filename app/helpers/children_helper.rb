@@ -8,6 +8,7 @@ module ChildrenHelper
   module EditView
     ONETIME_PHOTOS_UPLOAD_LIMIT = 5
   end
+  
   ORDER_BY = {'active' => 'created_at', 'all' => 'created_at', 'reunited' => 'reunited_at', 'flag' => 'flag_at'}
 
   def child_thumbnail_tag(child, key = nil)

@@ -8,8 +8,7 @@ class Enquiry < CouchRestRails::Document
   include AudioHelper
   include Searchable
 
-  before_save :update_photo_keys
-  before_save :find_matching_children, :is_criteria_empty
+  before_save :update_photo_keys, :find_matching_children, :is_criteria_empty
 
   property :enquirer_name
   property :criteria
@@ -36,7 +35,6 @@ class Enquiry < CouchRestRails::Document
     self['histories'] = []
     super *args
   end
-
 
   def is_criteria_empty
     return [false, I18n.t("errors.models.enquiry.presence_of_criteria")] if (criteria.nil? || criteria.empty? || criteria.blank?)
@@ -92,6 +90,21 @@ class Enquiry < CouchRestRails::Document
   def compact
     self['current_photo_key'] = '' if self['current_photo_key'].nil?
     self
+  end
+
+  def self.fetch_all_ids_and_revs
+    ids_and_revs = []
+    all_rows = self.view("by_ids_and_revs", :include_docs => false)["rows"]
+    all_rows.each do |row|
+      ids_and_revs << row["value"]
+    end
+    ids_and_revs
+  end
+
+  def self.fetch_paginated(options, page, per_page)
+    row_count = self.view("#{options[:view_name]}_count", options.merge(:include_docs => false))['rows'].size
+    per_page = row_count if per_page == "all"
+    [row_count, self.paginate(options.merge(:design_doc => 'Enquiry', :page => page, :per_page => per_page, :include_docs => true))]
   end
 
   private

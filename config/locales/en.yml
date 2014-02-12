@@ -92,12 +92,11 @@ en:
     label: "Enquiries"
     register_new_enquiry: "Register New Enquiry"
     enquirer_name: "Enquirer Name"
-    
+
   enquiry:
     id_number: "ID Number"
     matches_found: "Matches Found"
     last_updated: "Last Updated"
-
     messages:
       creation_success: "Enquiry record successfully created."
 
@@ -215,7 +214,9 @@ en:
       child:
         one: "child"
         other: "children"
-
+      enquiry:
+        one: "enquiry"
+        other: "enquiries"
   users:
     unverified: "Unverified Users"
     select_role: "Please select a role before verifying the user"
