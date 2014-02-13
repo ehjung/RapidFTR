@@ -9,6 +9,9 @@ RapidFTR.maintabControl = function(){
         case "children" : $(".main_bar li a:contains('CHILDREN')").addClass("sel");
         break;
 
+        case "enquiries" : $(".main_bar li a:contains('ENQUIRIES')").addClass("sel");
+        break;
+
         case "formsections" : $(".main_bar li a:contains('FORMS')").addClass("sel");
         break;
 

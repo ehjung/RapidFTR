@@ -23,6 +23,76 @@ class Enquiry < CouchRestRails::Document
 
   validates_with_method :criteria, :method => :is_criteria_empty
 
+  ['created_at', 'name', 'flag_at', 'reunited_at'].each do |field|
+
+    view_by "all_view_#{field}",
+            :map => "function(doc) {
+                var fDate = doc['#{field}'];
+                if (doc['couchrest-type'] == 'Enquiry')
+                {
+                  emit(['all', fDate], doc);
+                  if (doc.hasOwnProperty('flag') && doc['flag'] == 'true') {
+                    emit(['flag', fDate], doc);
+                  }
+
+                  if (doc.hasOwnProperty('reunited')) {
+                    if (doc['reunited'] == 'true') {
+                      emit(['reunited', fDate], doc);
+                    } else {
+                     if (!doc.hasOwnProperty('duplicate') && !doc['duplicate']) {
+                      emit(['active', fDate], doc);
+                    }
+                    }
+                  } else {
+                     if (!doc.hasOwnProperty('duplicate') && !doc['duplicate']) {
+                                    emit(['active', fDate], doc);
+                  }
+                  }
+               }
+            }"
+    
+    view_by "all_view_#{field}_count",
+            :map => "function(doc) {
+                if (doc['couchrest-type'] == 'Enquiry')
+               {
+                  emit(['all', doc['created_by']], 1);
+                  if (doc.hasOwnProperty('flag') && doc['flag'] == 'true') {
+                    emit(['flag', doc['created_by']], 1);
+                  }
+                  if (doc.hasOwnProperty('reunited')) {
+                    if (doc['reunited'] == 'true') {
+                      emit(['reunited', doc['created_by']], 1);
+                    } else {
+                      emit(['active', doc['created_by']], 1);
+                    }
+                  } else {
+                    emit(['active', doc['created_by']], 1);
+                  }
+               }
+            }"
+
+    view_by "all_view_with_created_by_#{field}",
+            :map => "function(doc) {
+                var fDate = doc['#{field}'];
+                if (doc['couchrest-type'] == 'Enquiry')
+                {
+                  emit(['all', doc['created_by'], fDate], doc);
+                  if (doc.hasOwnProperty('flag') && doc['flag'] == 'true') {
+                    emit(['flag', doc['created_by'], fDate], doc);
+                  }
+                  if (doc.hasOwnProperty('reunited')) {
+                    if (doc['reunited'] == 'true') {
+                      emit(['reunited', doc['created_by'], fDate], doc);
+                    } else {
+                      emit(['active', doc['created_by'], fDate], doc);
+                    }
+                  } else {
+                    emit(['active', doc['created_by'], fDate], doc);
+                  }
+               }
+            }"
+  end
+
   def initialize *args
     self['photo_keys'] ||= []
     arguments = args.first

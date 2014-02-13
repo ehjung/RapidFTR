@@ -5,7 +5,6 @@
 <%= render :partial => "children/filter_box" %>
 <%= render :partial => "children/order_by_box" %>
 </div>
-
 <div class="child_list">
   <%= render :partial => "children/summary_row", :collection => @children, :as => :child, :locals => { :checkbox => false, :highlighted_fields => FormSection.sorted_highlighted_fields  }  %>
     <%= render :partial => 'shared/pagination', :locals => { :child_results => @children } %>

@@ -289,11 +289,13 @@ class ChildrenController < ApplicationController
       keys = [filter_option, current_user_name]
       options = {:view_name => "by_all_view_with_created_by_#{params[:order_by] || 'created_at'}".to_sym}
     end
+
     if ['created_at', 'reunited_at', 'flag_at'].include? params[:order_by]
       options.merge!({:descending => true, :startkey => [keys, {}].flatten, :endkey => keys})
     else
       options.merge!({:startkey => keys, :endkey => [keys, {}].flatten})
     end
+
     Child.fetch_paginated(options, (params[:page] || 1).to_i, per_page)
   end
 

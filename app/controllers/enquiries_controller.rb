@@ -11,6 +11,41 @@ class EnquiriesController < ApplicationController
     render :nothing => true
   end
 
+  def index
+    authorize! :index, Enquiry
+
+    @record = "enquiries"
+    @page_name = t("home.view_records")
+    @aside = 'shared/sidebar_links'
+    @filter = params[:filter] || params[:status] || "all"
+    @order = params[:order_by] || 'name'
+    per_page = params[:per_page] || EnquiriesHelper::View::PER_PAGE
+    per_page = per_page.to_i unless per_page == 'all'
+
+    filter_enquiries per_page       
+
+# May need this after update for enquiries is implemented?
+=begin
+    if !params[:updated_after].nil?
+      @enquiries = Enquiry.search_by_match_updated_since(params[:updated_after])
+    end
+=end
+
+    respond_to do |format|
+      format.html
+      format.xml { render :xml => @enquiries }
+      unless params[:format].nil?
+        if @enquiries.empty?
+          flash[:notice] = t('enquiry.export_error')
+          redirect_to :action => :index and return
+        end
+      end
+
+      respond_to_export format, @enquiries
+    end
+  end
+
+
   def destroy_all
     authorize! :create, Enquiry
     Enquiry.all.each{|c| c.destroy}
@@ -59,7 +94,7 @@ class EnquiriesController < ApplicationController
     respond_to do |format|
       if @enquiry.save && @enquiry.valid?
         flash[:notice] = t('enquiry.messages.creation_success')
-        format.html { redirect_to(enquiries_path, :status => 201) }
+        format.html { redirect_to(enquiries_path) }
         format.xml { render :xml => @enquiry, :status => :created, :location => @enquiry }
         format.json {
           render :json => @enquiry.compact.to_json, :status => 201
@@ -93,29 +128,6 @@ class EnquiriesController < ApplicationController
     render :json => @enquiry
   end
 
-  def index
-    authorize! :index, Enquiry
-
-    @record = "enquiries"
-    @page_name = t("home.view_records")
-    @aside = 'shared/sidebar_links'
-    @filter = params[:filter] || params[:status] || "all"
-    @order = params[:order_by] || 'enquirer_name'
-    per_page = params[:per_page] || EnquiriesHelper::View::PER_PAGE
-    per_page = per_page.to_i unless per_page == 'all'
-
-    #filter_enquiries per_page
-
-
-    @record = "enquiries"
-    if params[:updated_after].nil?
-      @enquiries = Enquiry.all
-    else
-      @enquiries = Enquiry.search_by_match_updated_since(params[:updated_after])
-    end
-
-  end
-
   def show
     authorize! :show, Enquiry
     @record = "enquiries"
@@ -128,6 +140,7 @@ class EnquiriesController < ApplicationController
   end
 
   def filter_enquiries(per_page)
+
     total_rows, enquiries = enquiries_by_user_access(@filter, per_page)
     @enquiries = paginated_collection enquiries, total_rows
   end
@@ -139,18 +152,24 @@ class EnquiriesController < ApplicationController
     end
   end
 
-  def enquiries_by_user_access(filter_option, per_page)
+  def enquiries_by_user_access(filter_option, 
+    per_page)
     keys = [filter_option]
-    options = {:view_name => "by_all_view_#{params[:order_by] || 'enquirer_name'}".to_sym}
-    unless  can?(:view_all, Enquiry)
+    options = {:view_name => "by_all_view_#{params[:order_by] || 'name'}".to_sym}
+
+#Have to figure out if I need this...
+=begin
+    unless can?(:view_all, Enquiry)
       keys = [filter_option, current_user_name]
       options = {:view_name => "by_all_view_with_created_by_#{params[:order_by] || 'created_at'}".to_sym}
     end
+=end
     if ['created_at', 'reunited_at', 'flag_at'].include? params[:order_by]
       options.merge!({:descending => true, :startkey => [keys, {}].flatten, :endkey => keys})
     else
       options.merge!({:startkey => keys, :endkey => [keys, {}].flatten})
     end
+
     Enquiry.fetch_paginated(options, (params[:page] || 1).to_i, per_page)
   end
 
@@ -215,5 +234,20 @@ class EnquiriesController < ApplicationController
 
   def get_form_sections
     FormSection.enabled_by_order
+  end
+
+  def respond_to_export(format, enquiries)
+    RapidftrAddon::ExportTask.active.each do |export_task|
+      format.any(export_task.id) do
+        authorize! "export_#{export_task.id}".to_sym, Enquiry
+        LogEntry.create! :type => LogEntry::TYPE[export_task.id], :user_name => current_user.user_name, :organisation => current_user.organisation, :enquiry_ids => enquiries.collect(&:id)
+        results = export_task.new.export(enquiries)
+        encrypt_exported_files results, export_filename(enquiries, export_task)
+      end
+    end
+  end
+
+  def export_filename(enquiries, export_task)
+    (enquiries.length == 1 ? enquiries.first.short_id : current_user_name) + '_' + export_task.id.to_s + '.zip'
   end
 end

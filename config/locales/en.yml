@@ -92,6 +92,24 @@ en:
     label: "Enquiries"
     register_new_enquiry: "Register New Enquiry"
     enquirer_name: "Enquirer Name"
+    filter_by:
+      label: "Filter by"
+      all: "All"
+      active: "Active"
+      reunited: "Reunited"
+      flag: "Flagged"
+      created: "Created"
+    order_by:
+      most_recently: "Most recently"
+      label: "Order by"
+      name: "Name"
+    flag_summary: "Flag summary"
+
+    filer_by:
+      all: "All"
+      active: "Active"
+      reunited: "Reunited"
+      flagged: "Flagged"
 
   enquiry:
     id_number: "ID Number"
