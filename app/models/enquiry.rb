@@ -23,7 +23,7 @@ class Enquiry < CouchRestRails::Document
 
   validates_with_method :criteria, :method => :is_criteria_empty
 
-  ['created_at', 'name', 'flag_at', 'reunited_at'].each do |field|
+  ['created_at', 'enquirer_name', 'flag_at', 'reunited_at'].each do |field|
 
     view_by "all_view_#{field}",
             :map => "function(doc) {

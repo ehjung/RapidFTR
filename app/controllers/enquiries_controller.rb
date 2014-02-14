@@ -18,7 +18,7 @@ class EnquiriesController < ApplicationController
     @page_name = t("home.view_records")
     @aside = 'shared/sidebar_links'
     @filter = params[:filter] || params[:status] || "all"
-    @order = params[:order_by] || 'name'
+    @order = params[:order_by] || 'enquirer_name'
     per_page = params[:per_page] || EnquiriesHelper::View::PER_PAGE
     per_page = per_page.to_i unless per_page == 'all'
 
@@ -155,7 +155,7 @@ class EnquiriesController < ApplicationController
   def enquiries_by_user_access(filter_option, 
     per_page)
     keys = [filter_option]
-    options = {:view_name => "by_all_view_#{params[:order_by] || 'name'}".to_sym}
+    options = {:view_name => "by_all_view_#{params[:order_by] || 'enquirer_name'}".to_sym}
 
 #Have to figure out if I need this...
 =begin
