@@ -1,5 +1,6 @@
 <% child_results ||= WillPaginate::Collection.new 1,1,0 %>
 <% enquiry_results ||= WillPaginate::Collection.new 1,1,0 %>
+<% results ||= WillPaginate::Collection.new 1,1,0 %>
 
 <div class="pagination-box">
   <div class="page_info">
@@ -7,12 +8,16 @@
   		<%= page_entries_info child_results %>
   	<% elsif @record == "enquiries" %>
   		<%= page_entries_info enquiry_results %>
+    <% else %>
+      <%= page_entries_info results %>
   	<% end %>
   </div>
   <% if @record == "children" %>
-  		<%= will_paginate child_results %>
-  	<% elsif  @record == "enquiries" %>
-  		<%= will_paginate enquiry_results %>
-  	<% end %>
+  	<%= will_paginate child_results %>
+  <% elsif  @record == "enquiries" %>
+  	<%= will_paginate enquiry_results %>
+  <% else %>
+    <%= will_paginate results %>
+  <% end %>
   <div class="clearfix"></div>
 </div>

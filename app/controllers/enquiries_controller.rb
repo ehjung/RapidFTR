@@ -4,7 +4,6 @@ class EnquiriesController < ApplicationController
 
   before_filter :load_enquiry_or_redirect, :only => [ :show, :edit, :destroy, :edit_photo, :update_photo ]
   before_filter :current_user, :except => [:reindex]
-  before_filter :sanitize_params, :only => [:update, :sync_unverified]
 
   def reindex
     Child.reindex!
@@ -79,7 +78,6 @@ class EnquiriesController < ApplicationController
       @enquiry = Enquiry.new_with_user_name(current_user, params[:child])
     end
 
-
     @enquiry[:criteria] = params[:enquiry][:criteria]
     @enquiry[:enquirer_name] = params[:enquiry][:enquirer_name]
 
@@ -94,17 +92,15 @@ class EnquiriesController < ApplicationController
     respond_to do |format|
       if @enquiry.save && @enquiry.valid?
         flash[:notice] = t('enquiry.messages.creation_success')
-        format.html { redirect_to(enquiries_path) }
-        format.xml { render :xml => @enquiry, :status => :created, :location => @enquiry }
-        format.json {
-          render :json => @enquiry.compact.to_json, :status => 201
-        }
+        format.html { redirect_to enquiries_path }
+        format.xml { render :xml => @enquiry, :location => @enquiry, :status => :created }
+        format.json { render :json => @enquiry.compact.to_json }
       else
         format.html {
           @form_sections = get_form_sections
           render :action => 'new'
           }
-          format.xml { render :xml => @enquiry.errors, :status => :unprocessable_entity }
+        format.xml { render :xml => @enquiry.errors, :status => :unprocessable_entity }
       end
     end
   end

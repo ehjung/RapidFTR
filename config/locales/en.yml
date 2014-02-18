@@ -102,7 +102,7 @@ en:
     order_by:
       most_recently: "Most recently"
       label: "Order by"
-      name: "Name"
+      enquirer_name: "Enquirer Name"
     flag_summary: "Flag summary"
 
     filer_by:
@@ -342,6 +342,7 @@ en:
       Children: Children
       Forms: Forms
       Users: Users
+      Enquiries: Enquiries
       ALL: All
 
     permission:
@@ -364,6 +365,8 @@ en:
       "All": "All"
       "Users for synchronisation": "Manage Server Synchronisation Users"
       "View and Download Reports": "View and Download Reports"
+      "Create Enquiry" : "Create Enquiry"
+      "Update Enquiry" : "Update Enquiry"
   forms:
     label: "Forms"
     save: "Save Form"

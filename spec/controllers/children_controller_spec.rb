@@ -18,7 +18,7 @@ end
 describe ChildrenController do
 
   before :each do
-    child_fake_admin_login
+    fake_admin_login
   end
 
   def mock_child(stubs={})
@@ -730,7 +730,7 @@ describe ChildrenController do
       User.stub!(:find_by_user_name).with("uname").and_return(user = mock('user', :user_name => 'uname', :organisation => 'org'))
       child = Child.new_with_user_name(user, {:name => 'old name'})
       child.save
-      child_fake_admin_login
+      fake_admin_login
       controller.stub(:authorize!)
       post :create, :child => {:unique_identifier => child.unique_identifier, :name => 'new name'}
       updated_child = Child.by_short_id(:key => child.short_id)
