@@ -120,8 +120,7 @@ describe ChildrenController do
           children = [mock_child(@stubs)]
           @status ||= "all"
 
-          children.stub!(:paginate).and_return(children)
-  
+          children.stub!(:paginate).and_return(children) 
           Child.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, children])
 
           get :index, :status => @status
@@ -145,8 +144,10 @@ describe ChildrenController do
           per_page = @options.delete(:per_page)
           @status ||= "all"
           children.stub!(:paginate).and_return(children)
+
           Child.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, children])
           @params.merge!(:status => @status)
+
           get :index, @params
           assigns[:children].should == children
         end

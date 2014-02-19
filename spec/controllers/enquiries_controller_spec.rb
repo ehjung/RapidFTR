@@ -280,51 +280,73 @@ describe EnquiriesController do
 
   describe "GET index" do
 
-    describe "when the signed in user has access all data" do
+    shared_examples_for "viewing enquiries by user with access to all data" do
+      describe "when the signed in user has access all data" do
+        before do
+          fake_field_admin_login
+          @options ||= {}
+          @stubs ||= {}
+        end
+
+        it "should assign all enquiries as @enquiries" do
+          page = @options.delete(:page)
+          per_page = @options.delete(:per_page)
+          enquiries = [mock_enquiry(@stubs)]
+          @status ||= "all"
+
+          enquiries.stub!(:paginate).and_return(enquiries) 
+          Enquiry.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
+
+          get :index, :status => @status
+          assigns[:enquiries].should == enquiries
+        end
+      end
+    end
+
+    context "viewing all enquiries" do
+      before { @stubs = { :reunited? => false } }
+      context "when status is passed for admin" do
+        before { @status = "all"}
+        before {@options = {:startkey=>["all"], :endkey=>["all", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_enquirer_name}}
+        it_should_behave_like "viewing enquiries by user with access to all data"
+      end
+
+      context "when status is not passed admin" do
+        before {@options = {:startkey=>["all"], :endkey=>["all", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_enquirer_name}}
+        it_should_behave_like "viewing enquiries by user with access to all data"
+      end
+    end
+
+    context "viewing reunited enquirers" do
       before do
-        fake_field_admin_login
-        @options ||= {}
-        @stubs ||= {}
+        @status = "reunited"
+        @stubs = {:reunited? => true}
       end
-
-      it "should assign all enquiries as @enquiries" do
-        page = @options.delete(:page)
-        per_page = @options.delete(:per_page)
-        enquiries = [mock_enquiry(@stubs)]
-        @status ||= "all"
-
-        enquiries.stub!(:paginate).and_return(enquiries)
-        enquiries.stub!(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
-
-        #Enquiry.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
-        get :index, :status => @status
-       # assigns(:enquiries).should == enquiries
-
+      context "admin" do
+        before { @options = {:startkey=>["reunited"], :endkey=>["reunited", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_enquirer_name} }
+        it_should_behave_like "viewing enquiries by user with access to all data"
       end
     end
-=begin
-    it "should fetch all the enquiries" do
-      @stubs = { :reunited? => false }
-      @options = {:startkey=>["all"], :endkey=>["all", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_name}
 
-      controller.stub(:authorize!)
-
-      User.stub!(:find_by_user_name).with("uname").and_return(user = mock('user', :user_name => 'uname', :organisation => 'org'))
-      enquiry = Enquiry.new_with_user_name(user, {enquirer_name: "Mulan", criteria: {name: "Fatty"}})
-      enquiry.save should_not be_false
-
-      page = @options.delete(:page)
-      per_page = @options.delete(:per_page)
-      enquiries = [mock_enquiry(@stubs)]
-      @status ||= "all"
-
-      enquiries.stub!(:paginate).and_return(enquiries)
-      Enquiry.fetch_paginated(@options, page, per_page)
-      #Enquiry.should_receive(:fetch_paginated).with(@options, page, per_page).and_return([1, enquiries])
-      get :index, :status => @status
-      response.response_code.should == 200
+    context "viewing flagged enquiries" do
+      before { @status = "flagged" }
+      context "admin" do
+        before {@options = {:startkey=>["flagged"], :endkey=>["flagged", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_enquirer_name}}
+        it_should_behave_like "viewing enquiries by user with access to all data"
+      end
     end
-=end
+
+    context "viewing active enquiries" do
+      before do
+        @status = "active"
+        @stubs = {:reunited? => false}
+      end
+      context "admin" do
+        before {@options = {:startkey=>["active"], :endkey=>["active", {}], :page=>1, :per_page=>20, :view_name=>:by_all_view_enquirer_name}}
+        it_should_behave_like "viewing enquiries by user with access to all data"
+      end
+    end
+
     describe "when the signed in user is a field worker" do
       before do
         @session = fake_field_worker_login
@@ -337,10 +359,10 @@ describe EnquiriesController do
         controller.stub(:authorize!)
 
         enquiry = Enquiry.new({:_id => "123"})
+
         Enquiry.should_receive(:search_by_match_updated_since).with('2013-09-18 06:42:12UTC').and_return([enquiry])
 
         get :index, :updated_after => '2013-09-18 06:42:12UTC' 
-
         response.response_code.should == 200
       end
 
@@ -354,31 +376,7 @@ describe EnquiriesController do
     end
 
   end
-
-  describe "GET show" do
-    it "should fetch a particular enquiry" do
-      controller.stub(:authorize!)
-
-      Enquiry.should_receive(:get).with("123").and_return(mock(:to_json => "an enquiry record"))
-
-      get :show, :id => "123" 
-      response.response_code.should == 200
-      response.body.should == "an enquiry record"
-    end
-
-    it "should return a 404 with empty body if enquiry record does not exist" do
-      controller.stub(:authorize!)
-
-      Enquiry.should_receive(:get).with("123").and_return(nil)
-
-      get :show, :id => "123" 
-
-      response.body.should == ""
-      response.response_code.should == 404
-    end
-
-  end
-
+  
   describe "DELETE destroy_all" do
     it 'should not remove all enquires when env is not android' do
       stub_env('production') do

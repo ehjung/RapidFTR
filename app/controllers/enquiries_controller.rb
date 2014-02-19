@@ -4,6 +4,7 @@ class EnquiriesController < ApplicationController
 
   before_filter :load_enquiry_or_redirect, :only => [ :show, :edit, :destroy, :edit_photo, :update_photo ]
   before_filter :current_user, :except => [:reindex]
+  before_filter :sanitise_params
 
   def reindex
     Child.reindex!
@@ -21,14 +22,11 @@ class EnquiriesController < ApplicationController
     per_page = params[:per_page] || EnquiriesHelper::View::PER_PAGE
     per_page = per_page.to_i unless per_page == 'all'
 
-    filter_enquiries per_page       
-
-# May need this after update for enquiries is implemented?
-=begin
+    filter_enquiries per_page   
+        
     if !params[:updated_after].nil?
       @enquiries = Enquiry.search_by_match_updated_since(params[:updated_after])
     end
-=end
 
     respond_to do |format|
       format.html
@@ -39,7 +37,6 @@ class EnquiriesController < ApplicationController
           redirect_to :action => :index and return
         end
       end
-
       respond_to_export format, @enquiries
     end
   end
@@ -127,7 +124,8 @@ class EnquiriesController < ApplicationController
   def show
     authorize! :show, Enquiry
     @record = "enquiries"
-    enquiry = Enquiry.get (params[:id])
+    enquiry = Enquiry.get(params[:id])
+
     if !enquiry.nil?
       render :json => enquiry
     else
@@ -136,7 +134,6 @@ class EnquiriesController < ApplicationController
   end
 
   def filter_enquiries(per_page)
-
     total_rows, enquiries = enquiries_by_user_access(@filter, per_page)
     @enquiries = paginated_collection enquiries, total_rows
   end
@@ -153,13 +150,6 @@ class EnquiriesController < ApplicationController
     keys = [filter_option]
     options = {:view_name => "by_all_view_#{params[:order_by] || 'enquirer_name'}".to_sym}
 
-#Have to figure out if I need this...
-=begin
-    unless can?(:view_all, Enquiry)
-      keys = [filter_option, current_user_name]
-      options = {:view_name => "by_all_view_with_created_by_#{params[:order_by] || 'created_at'}".to_sym}
-    end
-=end
     if ['created_at', 'reunited_at', 'flag_at'].include? params[:order_by]
       options.merge!({:descending => true, :startkey => [keys, {}].flatten, :endkey => keys})
     else
@@ -186,7 +176,6 @@ class EnquiriesController < ApplicationController
 
   def load_enquiry_or_redirect
     @enquiry = Enquiry.get(params[:id])
-
     if @enquiry.nil?
       respond_to do |format|
         format.json { render :json => @enquiry.to_json }

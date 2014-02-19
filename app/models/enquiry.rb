@@ -1,5 +1,6 @@
 class Enquiry < CouchRestRails::Document
   use_database :enquiry
+  
   include RapidFTR::Model
   include RecordHelper
   include CouchRest::Validation
