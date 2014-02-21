@@ -27,6 +27,10 @@ class Enquiry < CouchRestRails::Document
   validates_with_method :validate_photos
   validates_with_method :validate_audio_size
   validates_with_method :validate_audio_file_name
+  validates_fields_of_type Field::NUMERIC_FIELD
+  validates_fields_of_type Field::TEXT_AREA
+  validates_fields_of_type Field::TEXT_FIELD
+
 
   ['created_at', 'enquirer_name', 'flag_at', 'reunited_at'].each do |field|
 
