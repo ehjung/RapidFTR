@@ -81,10 +81,6 @@ class EnquiriesController < ApplicationController
     params[:child][:photo] = params[:current_photo_key] unless params[:current_photo_key].nil?
     params[:child] = JSON.parse(params[:child]) if params[:child].is_a?(String)
     @child = params[:child]
-    
-    unless @enquiry.valid? then
-      render :json => {:error => @enquiry.errors.full_messages}, :status => 422 and return
-    end
 
     respond_to do |format|
       if @enquiry.save && @enquiry.valid?

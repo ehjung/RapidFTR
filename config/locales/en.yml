@@ -596,6 +596,9 @@ en:
         create_forbidden: "Forbidden"
         not_found: "Not found"
         malformed_query: "Invalid request"
+        photo_format: "Please upload a valid photo file (jpg or png) for this enquiry record"
+        photo_size: "Photo file is too large"
+        audio_size: "Audio file is too large"
 
       role:
         permission_presence: "Please select at least one permission"

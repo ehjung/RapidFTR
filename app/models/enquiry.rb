@@ -19,10 +19,14 @@ class Enquiry < CouchRestRails::Document
   Sunspot::Adapters::InstanceAdapter.register(DocumentInstanceAccessor, Enquiry)
   Sunspot::Adapters::DataAccessor.register(DocumentDataAccessor, Enquiry)
 
-
   validates_presence_of :enquirer_name, :message => I18n.t("errors.models.enquiry.presence_of_enquirer_name")
 
   validates_with_method :criteria, :method => :is_criteria_empty
+
+  validates_with_method :validate_photos_size
+  validates_with_method :validate_photos
+  validates_with_method :validate_audio_size
+  validates_with_method :validate_audio_file_name
 
   ['created_at', 'enquirer_name', 'flag_at', 'reunited_at'].each do |field|
 
@@ -176,6 +180,26 @@ class Enquiry < CouchRestRails::Document
     row_count = self.view("#{options[:view_name]}_count", options.merge(:include_docs => false))['rows'].size
     per_page = row_count if per_page == "all"
     [row_count, self.paginate(options.merge(:design_doc => 'Enquiry', :page => page, :per_page => per_page, :include_docs => true))]
+  end
+
+  def validate_photos
+    return true if @photos.blank? || @photos.all? { |photo| /image\/(jpg|jpeg|png)/ =~ photo.content_type }
+    [false, I18n.t("errors.models.enquiry.photo_format")]
+  end
+
+  def validate_photos_size
+    return true if @photos.blank? || @photos.all? { |photo| photo.size < 10.megabytes }
+    [false, I18n.t("errors.models.enquiry.photo_size")]
+  end
+
+  def validate_audio_size
+    return true if @audio.blank? || @audio.size < 10.megabytes
+    [false, I18n.t("errors.models.enquiry.audio_size")]
+  end
+
+  def validate_audio_file_name
+    return true if @audio_file_name == nil || /([^\s]+(\.(?i)(amr|mp3))$)/ =~ @audio_file_name
+    [false, "Please upload a valid audio file (amr or mp3) for this child record"]
   end
 
   private
