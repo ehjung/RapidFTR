@@ -74,7 +74,7 @@ class ApplicationController < ActionController::Base
   def restrict_to_test
 
     if !Rails.env.android?
-      #raise ErrorResponse.unauthorized("Unauthorized Operation") 
+      raise ErrorResponse.unauthorized("Unauthorized Operation") 
       render :json => "Unauthorized Operation", :status => 401
     end 
   end

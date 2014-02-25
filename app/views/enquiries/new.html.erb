@@ -4,14 +4,14 @@
   <div class="page-content-new">
     <%= error_messages_for :enquiry %>
     <%= hidden_field_tag :is_nil, true %>
+    </br>
+
     <div class="form_info">
-      <br />
-      <p>
-        <span class="tool-tip-label"><%= label_tag "Enquirer", nil, class: 'key' %></span>
-        <input type="text" id="enquiry_enquirer_name" name="enquiry[enquirer_name]" />
-      </p>
-      <br />
+        <span class="tool-tip-label"><%= label_tag t("enquiries.enquirer_name"), nil, class: 'key' %></span>
+        <input type="text" id="enquiry_enquirer_name" name="enquiry[enquirer_name]" />  
     </div>
+
+    </br>
     <div class="side-tab">
       <%= render :partial => "tabs", :object => @form_sections %>
     </div>

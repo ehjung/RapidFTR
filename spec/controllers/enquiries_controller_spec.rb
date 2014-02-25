@@ -1,5 +1,7 @@
 require "spec_helper"
 
+  UNPROCESSABLE_ENTITY = 422
+
 def inject_export_generator( fake_export_generator, enquiry_data )
   ExportGenerator.stub!(:new).with(enquiry_data).and_return( fake_export_generator )
 end
@@ -25,7 +27,6 @@ describe EnquiriesController do
   def mock_enquiry(stubs={})
     @mock_enquiry ||= mock_model(Enquiry, stubs).as_null_object
   end
-
 
   describe "#authorizations" do
     it "should fail to POST create when unauthorized" do
@@ -84,14 +85,14 @@ describe EnquiriesController do
     it "should not create enquiry without criteria" do
       controller.stub(:authorize!)
       post :create, :enquiry => {:enquirer_name => "new name", :reporter_details => {"location" => "kampala"}}
-      response.response_code.should == 422
+      response.response_code.should == UNPROCESSABLE_ENTITY
       JSON.parse(response.body)["error"].should include("Please add criteria to your enquiry")
     end
 
     it "should not create enquiry with empty criteria" do
       controller.stub(:authorize!)
       post :create, :enquiry => {:enquirer_name => "new name", :criteria => {}}
-      response.response_code.should == 422
+      response.response_code.should == UNPROCESSABLE_ENTITY
       JSON.parse(response.body)["error"].should include("Please add criteria to your enquiry")
     end
 
@@ -376,31 +377,5 @@ describe EnquiriesController do
     end
 
   end
-  
-  describe "DELETE destroy_all" do
-    it 'should not remove all enquires when env is not android' do
-      stub_env('production') do
-        delete :destroy_all
-        response.body.should == "Unauthorized Operation"
-        response.response_code.should == 401
-      end
-
-      stub_env('test') do
-        delete :destroy_all
-        response.body.should == "Unauthorized Operation"
-        response.response_code.should == 401
-      end
-    end
-
-    it 'should delete all enquiry records when env is android' do
-      stub_env('android') do
-        @controller.current_ability.should_receive(:can?).with(:create, Enquiry).and_return(true)
-        delete :destroy_all
-        response.body.should == ""
-        response.response_code.should == 200
-      end
-    end
-  end
-
   
 end

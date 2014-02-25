@@ -116,6 +116,8 @@ class Enquiry < CouchRestRails::Document
   end
 
   def is_criteria_empty
+    return [false, I18n.t("errors.models.enquiry.presence_of_criteria")] if (criteria.nil? || criteria.empty? || criteria.blank?)
+
     criteria.values.each do |value|
         i = 0
         while i < criteria.values.count 
@@ -125,6 +127,7 @@ class Enquiry < CouchRestRails::Document
           i = i + 1
         end
     end
+    
     return [false, I18n.t("errors.models.enquiry.presence_of_criteria")]
   end 
 

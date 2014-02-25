@@ -89,11 +89,13 @@ class EnquiriesController < ApplicationController
         format.xml { render :xml => @enquiry, :location => @enquiry, :status => :created }
         format.json { render :json => @enquiry.compact.to_json }
       else
-        format.html {
-          @form_sections = get_form_sections
-          render :action => 'new'
-          }
+        format.html { @form_sections = get_form_sections
+          render :action => 'new' }
         format.xml { render :xml => @enquiry.errors, :status => :unprocessable_entity }
+      end
+
+      unless @enquiry.valid? then
+        render :json => {:error => @enquiry.errors.full_messages}, :status => :unprocessable_entity and return
       end
     end
   end

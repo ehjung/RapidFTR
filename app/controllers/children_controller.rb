@@ -105,6 +105,7 @@ class ChildrenController < ApplicationController
           render :action => "new"
         }
         format.xml { render :xml => @child.errors, :status => :unprocessable_entity }
+        
       end
     end
   end
