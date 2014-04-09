@@ -9,39 +9,44 @@ Background:
     | Honey         | Dew      | zubair   | honey_uid  | false    | false  | hon_uid   | 2001-01-02 01:01:01UTC | DateTime.new(2002,2,1,4,5,6) | DateTime.new(2002,2,3,4,5,6) |
     And I am on the enquiries listing page
 
-
+@wip
 Scenario: Viewing enquiries filtered by All should by default show all enquiries in alphabetical order
   Then I should see the order Graham,Honey,Marsh
   And I should see "Enquirer Name"
   And I should see "ID Number"
   And I should see "Matches Found"
-  #And I should see "Registered By"
+  And I should see "Registered By"
   And I should see "Last Updated"
 
+@wip
 Scenario: Viewing enquiries filtered by All and order by Most recently created
   And I select "Most recently created" from "order_by"
-#  Then I should see the order Marsh,Graham,Honey
+  Then I should see the order Marsh,Graham,Honey
 
+@wip
 Scenario: Viewing enquiries filtered by Active and ordered by Enquirer Name
   When I select "Active" from "filter"
   Then I should see "Marsh"
   And I should see "Honey"
-#  And I should not see "Graham"
+  And I should not see "Graham"
 
+@wip
 Scenario: Viewing enquiries filtered by Reunited and ordered by Enquirer Name
   When I select "Reunited" from "filter"
   Then I should see "Graham"
-#  And I should not see "Marsh"
-#  And I should not see "Honey"
+  And I should not see "Marsh"
+  And I should not see "Honey"
 
+@wip
 Scenario: Viewing enquiries filtered by Flagged and ordered by Enquirer Name
   When I select "Flagged" from "filter"
   Then I should see "Marsh"
-#  And I should not see "Graham"
-#  And I should not see "Honey"
+  And I should not see "Graham"
+  And I should not see "Honey"
 
+@wip
 Scenario: Viewing enquiries filtered by Active and ordered by Most recently created
   When I select "Active" from "filter"
   And I select "Most recently created" from "order_by"
   Then I should see the order Honey,Marsh
-#  And I should not see "Graham"
+  And I should not see "Graham"
