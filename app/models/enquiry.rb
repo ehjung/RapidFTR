@@ -7,17 +7,17 @@ class Enquiry < CouchRestRails::Document
   include PhotoHelper
   include AttachmentHelper
   include AudioHelper
-  include Searchable
+  #include Searchable
 
-  before_save :update_photo_keys, :find_matching_children, :is_criteria_empty
+  before_save :update_photo_keys, :is_criteria_empty #:find_matching_children
 
   property :enquirer_name
   property :criteria
   property :potential_matches, :default => []
   property :match_updated_at, :default => ""
 
-  Sunspot::Adapters::InstanceAdapter.register(DocumentInstanceAccessor, Enquiry)
-  Sunspot::Adapters::DataAccessor.register(DocumentDataAccessor, Enquiry)
+  #Sunspot::Adapters::InstanceAdapter.register(DocumentInstanceAccessor, Enquiry)
+  #Sunspot::Adapters::DataAccessor.register(DocumentDataAccessor, Enquiry)
 
   validates_presence_of :enquirer_name, :message => I18n.t("errors.models.enquiry.presence_of_enquirer_name")
 
@@ -115,6 +115,27 @@ class Enquiry < CouchRestRails::Document
     super *args
   end
 
+=begin
+  def self.build_solar_schema
+    text_fields = build_text_fields_for_solar
+    date_fields = build_date_fields_for_solar
+    Sunspot.setup(Enquiry) do
+      text *text_fields
+      date *date_fields
+      date_fields.each { |date_field| date date_field }
+      boolean :duplicate
+    end
+  end
+
+  def self.build_text_fields_for_solar
+    ["unique_identifier", "short_id", "created_by", "created_by_full_name", "last_updated_by", "last_updated_by_full_name", "created_organisation"] + Field.all_searchable_field_names
+  end
+
+  def self.build_date_fields_for_solar
+    ["created_at", "last_updated_at"]
+  end
+=end
+
   def is_criteria_empty
     return [false, I18n.t("errors.models.enquiry.presence_of_criteria")] if (criteria.nil? || criteria.empty? || criteria.blank?)
 
@@ -131,10 +152,11 @@ class Enquiry < CouchRestRails::Document
     return [false, I18n.t("errors.models.enquiry.presence_of_criteria")]
   end 
 
-  def self.new_with_user_name (user, *args)
-    enquiry = new *args
-    enquiry.set_creation_fields_for(user)
+  def self.new_with_user_name (user, fields = {})
+    enquiry = new(fields)
     enquiry.create_unique_id
+    enquiry['enquirer_name'] = fields['enquirer_name'] || enquiry.enquirer_name || ''
+    enquiry.set_creation_fields_for user
     enquiry
   end
 
@@ -147,7 +169,7 @@ class Enquiry < CouchRestRails::Document
       end
     end
   end
-
+=begin
   def find_matching_children
     previous_matches = self.potential_matches
     children = MatchService.search_for_matching_children(self.criteria)
@@ -164,7 +186,7 @@ class Enquiry < CouchRestRails::Document
       !e['match_updated_at'].empty? and DateTime.parse(e['match_updated_at']) >= timestamp
     }
   end
-
+=end
   def create_unique_id
     self['unique_identifier'] ||= UUIDTools::UUID.random_create.to_s
   end

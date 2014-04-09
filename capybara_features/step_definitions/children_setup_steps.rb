@@ -29,6 +29,7 @@ Given /^the following children exist in the system:$/ do |children_table|
     else
       child_hash.delete('duplicate')
     end
+
     User.find_by_user_name(user_name).
         update_attributes({:organisation => child_hash['created_organisation']}) if child_hash['created_organisation']
 

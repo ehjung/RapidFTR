@@ -7,17 +7,21 @@ Background:
     | Graham        | Crackers | zubair   | graham_uid | true     | false  | gra_uid   | 2014-03-28 04:05:06UTC | DateTime.new(2080,1,1,1,1,1) | DateTime.new(2091,2,3,4,5,6) |
     | Marsh         | Mallow   | zubair   | marsh_uid  | false    | true   | mar_uid   | 2100-01-01 03:02:01UTC | DateTime.new(2101,2,1,4,5,6) | DateTime.new(2102,2,3,4,5,6) |
     | Honey         | Dew      | zubair   | honey_uid  | false    | false  | hon_uid   | 2001-01-02 01:01:01UTC | DateTime.new(2002,2,1,4,5,6) | DateTime.new(2002,2,3,4,5,6) |
+    And I am on the enquiries listing page
 
-@javascript
 
 Scenario: Viewing enquiries filtered by All should by default show all enquiries in alphabetical order
-  Then I should see the order Graham, Honey, Marsh
-  And I should see the basic details Enquirer Name, ID Number, Matches Found, Registered By and Last Updated fields
+  Then I should see the order Graham,Honey,Marsh
+  And I should see "Enquirer Name"
+  And I should see "ID Number"
+  And I should see "Matches Found"
+  #And I should see "Registered By"
+  And I should see "Last Updated"
 
 @javascript
 
 Scenario: Viewing enquiries filtered by All and order by Most recently created
-  When I select "Most recently created" from "Order by"
+  And I select "Most recently created" from "Order by"
   Then I should see the order Marsh, Graham, Honey
 
 @javascript
